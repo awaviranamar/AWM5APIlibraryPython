@@ -1,3 +1,4 @@
+[Read Me.docx](https://github.com/user-attachments/files/21129708/Read.Me.docx)
 # AWM5APIlibraryPython
 ________________________________________
 📘 Guide to Using the M5 API Python Library
