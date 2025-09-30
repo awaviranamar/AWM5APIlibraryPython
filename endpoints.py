@@ -1,10 +1,54 @@
 '''
     Created by Aviran Amar, API Support Engineer at AssetWorks. Built on 16th June 2025
+    Enhanced with Dynamic Model Loading
 
 '''
+import os
+import importlib.util
+import inspect
+
 class endpoints:
     def __init__(self, ApiClient):
         self.ApiClient = ApiClient
+        self._load_custom_models()
+    
+    def _load_custom_models(self):
+        """Load custom models from models directory"""
+        models_dir = os.path.join(os.path.dirname(__file__), 'models')
+        
+        if not os.path.exists(models_dir):
+            return
+        
+        # Iterate through all files in models directory
+        for filename in os.listdir(models_dir):
+            if filename.endswith('.py') and filename != '__init__.py':
+                model_name = filename[:-3]  # Remove .py extension
+                model_path = os.path.join(models_dir, filename)
+                
+                try:
+                    # Load the module
+                    spec = importlib.util.spec_from_file_location(model_name, model_path)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    
+                    # Find class ending with Model
+                    for name, obj in inspect.getmembers(module, inspect.isclass):
+                        if name.endswith('Model'):
+                            # Create model instance
+                            model_instance = obj(self.ApiClient)
+                            
+                            # Replace functions starting with model name
+                            prefix = model_name + '_'
+                            for method_name in dir(model_instance):
+                                if method_name.startswith(prefix) and not method_name.startswith('_'):
+                                    # Replace existing function
+                                    setattr(self, method_name, getattr(model_instance, method_name))
+                                    print(f"✅ Replaced: {method_name} from {model_name} model")
+                            
+                            break
+                            
+                except Exception as e:
+                    print(f"❌ Error loading model {model_name}: {e}")
 
     def Accidents_Get(self):
         return self.ApiClient.getAPI(f'/accidents')

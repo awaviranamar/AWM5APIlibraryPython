@@ -66,12 +66,36 @@ ________________________________________
 •	Use print(client.getToken()) to verify token retrieval.
 •	Use client.customAPI("GET", endpoint="/your-endpoint") for quick testing.
 ________________________________________
-5. 🛠️ Extending the Library
+5. 🔄 Dynamic Model Loading (NEW!)
+The library now supports custom models that can override default endpoints:
+
+📁 Create custom models in the `models/` folder:
+```python
+# models/Accidents.py
+class AccidentsModel:
+    def __init__(self, ApiClient):
+        self.ApiClient = ApiClient
+    
+    def Accidents_Get(self):
+        print("🚗 Using custom Accidents model")
+        return self.ApiClient.getAPI('/accidents')
+```
+
+✨ The system automatically:
+• Detects custom models in `models/` folder
+• Replaces matching endpoint functions
+• Allows adding new custom functions
+
+📖 See `DYNAMIC_MODELS_README.md` for detailed guide
+________________________________________
+6. 🛠️ Extending the Library
 To add a new endpoint:
 1.	Add a method in endpoints.py:
    def Vehicles_Get(self):
        return self.ApiClient.getAPI('/vehicles')
 2.	Call it like:
    vehicles = client.API.Vehicles_Get()
+
+OR create a custom model in `models/Vehicles.py`
 ________________________________________
 
